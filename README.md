@@ -1,8 +1,6 @@
-gridlock-808
-
 ====================================================================
   _______ _____  _____ _____  _      ____   _____ _  __   ___   ___   ___ 
- / ____  |  __ \|_   _|  __ \| |    / __ \ / ____| |/ /  / _ \ / _ \ / _ \
+ / ____  |  __ \|_   _|  __ \| |    / __ \ / ____| |/ /  / _ \ / _ \ / _ 
 | |  __| | |__) | | | | |  | | |   | |  | | |    | ' /  | (_) | (_) | (_) |
 | | |_ | |  _  /  | | | |  | | |   | |  | | |    |  <    > _ < > _ < > _ <
 | |__| | | | \ \ _| |_| |__| | |___| |__| | |____| . \  | (_) | (_) | (_) |
@@ -83,4 +81,4 @@ Run the output ROM on real hardware using a modern flash cartridge, or launch it
 
     Submission Format: Pure .gba binary file  
 
-    Content Rule Compliance: 100% human-authored logic, graphics, and audio track integration.
+    Content Rule Compliance: 100% human-authored logic, graphics, and audio track integration..
