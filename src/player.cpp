@@ -77,31 +77,98 @@ void Player::usePayload(Grid& grid, Player players[], int num_players) {
 }
 
 void Player::render() {
-    // Placeholder to render the player as a 4x4 square on the screen
-    // This would be replaced with sprite rendering in a real game
-    unsigned short player_color = 0;
+    unsigned short color = 0;
     switch(playerId) {
-        case 0: player_color = RGB5(31, 0, 0); break; // Red
-        case 1: player_color = RGB5(0, 0, 31); break; // Blue
-        case 2: player_color = RGB5(0, 31, 0); break; // Green
-        case 3: player_color = RGB5(31, 31, 0); break; // Yellow
+        case 0: color = RGB5(31, 10, 10); break; // Glowing Red/Pink
+        case 1: color = RGB5(10, 20, 31); break; // Glowing Blue
+        case 2: color = RGB5(10, 31, 10); break; // Glowing Green
+        case 3: color = RGB5(31, 31, 10); break; // Glowing Yellow
     }
 
-    // Draw a 4x4 square for the player
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            m3_plot((x * 16) + i + 6, (y * 16) + j + 6, player_color);
-        }
+    int px = x * 16;
+    int py = y * 16;
+
+    // Apply visual glitch shift if glitched
+    int x_shift = 0;
+    int y_shift = 0;
+    if (glitchEffectTimer > 0) {
+        // Shift left/right based on timer ticks to create a vibrating glitch effect
+        x_shift = (glitchEffectTimer % 4 == 0) ? -2 : ((glitchEffectTimer % 4 == 2) ? 2 : 0);
+        y_shift = (glitchEffectTimer % 3 == 0) ? -1 : ((glitchEffectTimer % 3 == 2) ? 1 : 0);
     }
 
+    px += x_shift;
+    py += y_shift;
+
+    // 1. Draw corner brackets for the hacker avatar
+    // Top-Left
+    m3_plot(px + 2, py + 2, color);
+    m3_plot(px + 3, py + 2, color);
+    m3_plot(px + 4, py + 2, color);
+    m3_plot(px + 2, py + 3, color);
+    m3_plot(px + 2, py + 4, color);
+
+    // Top-Right
+    m3_plot(px + 13, py + 2, color);
+    m3_plot(px + 12, py + 2, color);
+    m3_plot(px + 11, py + 2, color);
+    m3_plot(px + 13, py + 3, color);
+    m3_plot(px + 13, py + 4, color);
+
+    // Bottom-Left
+    m3_plot(px + 2, py + 13, color);
+    m3_plot(px + 3, py + 13, color);
+    m3_plot(px + 4, py + 13, color);
+    m3_plot(px + 2, py + 12, color);
+    m3_plot(px + 2, py + 11, color);
+
+    // Bottom-Right
+    m3_plot(px + 13, py + 13, color);
+    m3_plot(px + 12, py + 13, color);
+    m3_plot(px + 11, py + 13, color);
+    m3_plot(px + 13, py + 12, color);
+    m3_plot(px + 13, py + 11, color);
+
+    // 2. Draw crosshair center ticks
+    m3_plot(px + 8, py + 5, color);
+    m3_plot(px + 8, py + 6, color);
+    m3_plot(px + 8, py + 9, color);
+    m3_plot(px + 8, py + 10, color);
+    m3_plot(px + 5, py + 8, color);
+    m3_plot(px + 6, py + 8, color);
+    m3_plot(px + 9, py + 8, color);
+    m3_plot(px + 10, py + 8, color);
+
+    // 3. Draw a solid central core (white)
+    m3_plot(px + 7, py + 7, RGB5(31, 31, 31));
+    m3_plot(px + 8, py + 7, RGB5(31, 31, 31));
+    m3_plot(px + 7, py + 8, RGB5(31, 31, 31));
+    m3_plot(px + 8, py + 8, RGB5(31, 31, 31));
+
+    // 4. Draw circular shield ring if shielded
     if (shielded) {
-        // Draw a white border around the player to indicate shield
-        for (int i = 0; i < 6; i++) {
-            m3_plot((x * 16) + 5, (y * 16) + 5 + i, RGB5(31,31,31));
-            m3_plot((x * 16) + 10, (y * 16) + 5 + i, RGB5(31,31,31));
-            m3_plot((x * 16) + 5 + i, (y * 16) + 5, RGB5(31,31,31));
-            m3_plot((x * 16) + 5 + i, (y * 16) + 10, RGB5(31,31,31));
-        }
+        unsigned short shield_color = RGB5(0, 31, 31); // Glowing Cyan
+        
+        m3_plot(px + 8, py + 1, shield_color);
+        m3_plot(px + 7, py + 1, shield_color);
+        m3_plot(px + 9, py + 1, shield_color);
+        
+        m3_plot(px + 8, py + 14, shield_color);
+        m3_plot(px + 7, py + 14, shield_color);
+        m3_plot(px + 9, py + 14, shield_color);
+        
+        m3_plot(px + 1, py + 8, shield_color);
+        m3_plot(px + 1, py + 7, shield_color);
+        m3_plot(px + 1, py + 9, shield_color);
+        
+        m3_plot(px + 14, py + 8, shield_color);
+        m3_plot(px + 14, py + 7, shield_color);
+        m3_plot(px + 14, py + 9, shield_color);
+
+        m3_plot(px + 3, py + 3, shield_color);
+        m3_plot(px + 12, py + 3, shield_color);
+        m3_plot(px + 3, py + 12, shield_color);
+        m3_plot(px + 12, py + 12, shield_color);
     }
 }
 
