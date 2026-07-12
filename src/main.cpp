@@ -25,7 +25,9 @@ int main() {
 
     while (1) {
         // Halt the CPU until the next VBlank
-        VBlankIntrWait();
+        // Wait for VBlank (VSync)
+        while (REG_VCOUNT >= 160);
+        while (REG_VCOUNT < 160);
         scanKeys();
 
         // Get local input
