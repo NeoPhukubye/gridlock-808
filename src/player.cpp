@@ -2,7 +2,7 @@
 #include "grid.h"
 #include <gba_video.h>
 
-Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), glitchEffectTimer(0), lastDirection(DIR_DOWN) {
+Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), shieldTimer(0), glitchEffectTimer(0), lastDirection(DIR_DOWN) {
     // Initialize player position based on ID
     switch (playerId) {
         case 0: x = 1; y = 1; break;
@@ -30,17 +30,20 @@ void Player::update(unsigned short input, Grid& grid) {
         if (input & KEY_RIGHT) { newX++; lastDirection = DIR_RIGHT; }
     }
 
+    if (shieldTimer > 0) {
+        shieldTimer--;
+        if (shieldTimer == 0) {
+            shielded = false;
+        }
+    }
+
     if (grid.isMoveValid(newX, newY)) {
         x = newX;
         y = newY;
     }
-
-    if (input & KEY_A) {
-        usePayload(grid);
-    }
 }
 
-void Player::usePayload(Grid& grid) {
+void Player::usePayload(Grid& grid, Player players[], int num_players) {
     switch (currentPayload) {
         case PAYLOAD_FIREWALL: {
             int targetX = x;
@@ -57,11 +60,15 @@ void Player::usePayload(Grid& grid) {
             break;
         }
         case PAYLOAD_GLITCH:
-            // In a real multiplayer game, this would send a glitch packet
-            // to other players. For now, it does nothing.
+            for (int i = 0; i < num_players; ++i) {
+                if (players[i].getPlayerId() != playerId) {
+                    players[i].activateGlitch(120); // 2 seconds
+                }
+            }
             break;
         case PAYLOAD_SHIELD:
             shielded = true;
+            shieldTimer = 180; // 3 seconds at 60fps
             break;
         case PAYLOAD_NONE:
             break;
@@ -86,10 +93,30 @@ void Player::render() {
             m3_plot((x * 16) + i + 6, (y * 16) + j + 6, player_color);
         }
     }
+
+    if (shielded) {
+        // Draw a white border around the player to indicate shield
+        for (int i = 0; i < 6; i++) {
+            m3_plot((x * 16) + 5, (y * 16) + 5 + i, RGB5(31,31,31));
+            m3_plot((x * 16) + 10, (y * 16) + 5 + i, RGB5(31,31,31));
+            m3_plot((x * 16) + 5 + i, (y * 16) + 5, RGB5(31,31,31));
+            m3_plot((x * 16) + 5 + i, (y * 16) + 10, RGB5(31,31,31));
+        }
+    }
 }
 
 void Player::setPayload(Payload p) {
     currentPayload = p;
+}
+
+void Player::increaseScore(int amount) {
+    score += amount;
+}
+
+void Player::activateGlitch(int duration) {
+    if (!shielded) {
+        glitchEffectTimer = duration;
+    }
 }
 
 int Player::getX() const { return x; }

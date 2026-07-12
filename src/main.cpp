@@ -3,10 +3,12 @@
 #include <gba_system.h>
 #include <gba_input.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "grid.h"
 #include "player.h"
 #include "link.h"
+#include "text.h"
 
 // Main game loop
 int main() {
@@ -36,6 +38,10 @@ int main() {
         for (int i = 0; i < num_players; ++i) {
             players[i].update(inputs[i], grid);
 
+            if (inputs[i] & KEY_A) {
+                players[i].usePayload(grid, players, num_players);
+            }
+
             // Check for tile interactions
             TileType currentTile = grid.getTile(players[i].getX(), players[i].getY());
             if (currentTile == TILE_NODE) {
@@ -48,6 +54,7 @@ int main() {
             } else if (currentTile == TILE_NEUTRAL) {
                 // Capture the tile
                 grid.setTile(players[i].getX(), players[i].getY(), (TileType)(TILE_CAPTURED_P1 + i));
+                players[i].increaseScore(10);
             }
         }
 
@@ -58,6 +65,13 @@ int main() {
         grid.render();
         for (int i = 0; i < num_players; ++i) {
             players[i].render();
+        }
+
+        // Display scores
+        char score_str[10];
+        for (int i = 0; i < num_players; ++i) {
+            sprintf(score_str, "P%d: %d", i + 1, players[i].getScore());
+            draw_text(10, i * 10, score_str, RGB5(31, 31, 31));
         }
     }
 

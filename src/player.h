@@ -27,15 +27,17 @@ public:
     Player(int id);
 
     void update(unsigned short input, Grid& grid);
-    void usePayload(Grid& grid);
+    void usePayload(Grid& grid, Player* players, int num_players);
     void render();
     void setPayload(Payload p);
+    void increaseScore(int amount);
 
     int getX() const;
     int getY() const;
     int getScore() const;
     int getPlayerId() const;
     bool isShielded() const;
+    void activateGlitch(int duration);
 
 private:
     int playerId;
@@ -43,6 +45,7 @@ private:
     int score;
     Payload currentPayload;
     bool shielded;
+    int shieldTimer;
     int glitchEffectTimer;
     Direction lastDirection;
 };
