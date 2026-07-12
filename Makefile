@@ -19,7 +19,7 @@ OBJS := $(patsubst %.cpp, %.o, $(SRCS))
 
 # Build flags
 ARCH := -mthumb -mthumb-interwork
-SPECS := -specs=gba.specs
+SPECS := -specs=$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba.specs
 CFLAGS := $(ARCH) -O2 -Wall -fomit-frame-pointer -I$(DEVKITPRO)/libgba/include
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 LDFLAGS := $(SPECS) $(ARCH) -L$(DEVKITPRO)/libgba/lib -Wl,-Map,$(TARGET).map -lgba
