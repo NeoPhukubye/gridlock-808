@@ -38,6 +38,9 @@ void Player::update(unsigned short input, Grid& grid) {
     }
 
     if (grid.isMoveValid(newX, newY)) {
+        if (newX != x || newY != y) {
+            play_move_sound();
+        }
         x = newX;
         y = newY;
     }

@@ -102,4 +102,44 @@ enum LinkState {
     LINK_STATE_ERROR
 };
 
+// GBA PSG Legacy Audio system helpers
+static inline void audio_init() {
+    *(volatile unsigned short*)0x04000084 = 0x0080; // Master Sound Enable (Bit 7)
+    *(volatile unsigned short*)0x04000080 = 0x0077; // Max Volume left/right for DMG channels
+    *(volatile unsigned short*)0x04000082 = 0x00FF; // Enable DMG mixer channels
+}
+
+static inline void play_move_sound() {
+    *(volatile unsigned short*)0x04000068 = 0x8100; // Channel 2: volume 8, fast decay
+    *(volatile unsigned short*)0x0400006c = 0xC550; // Play short cyber-chirp beep
+}
+
+static inline void play_capture_sound() {
+    *(volatile unsigned short*)0x04000078 = 0xF100; // Channel 4: volume F, fast decay
+    *(volatile unsigned short*)0x0400007c = 0xC030; // Play digital noise crunch
+}
+
+static inline void play_payload_sound() {
+    *(volatile unsigned short*)0x04000068 = 0xD200; // Channel 2: volume D, medium decay
+    *(volatile unsigned short*)0x0400006c = 0xC700; // Play higher chime chime
+}
+
+static inline void audio_update() {
+    static int music_timer = 0;
+    static int music_index = 0;
+    
+    music_timer++;
+    if (music_timer >= 12) { // ~120 BPM
+        music_timer = 0;
+        
+        // Cyberpunk synthwave bass progression (A3, A3, C4, A3, D4, A3, C4, G3)
+        static const unsigned short bass_notes[] = { 1452, 1452, 1547, 1452, 1602, 1452, 1547, 1380 };
+        unsigned short note = bass_notes[music_index];
+        music_index = (music_index + 1) % 8;
+        
+        *(volatile unsigned short*)0x04000062 = 0x6420; // Channel 1: volume 6, decay 2
+        *(volatile unsigned short*)0x04000064 = 0xC000 | note; // Play note
+    }
+}
+
 #endif // NETWORK_H

@@ -15,6 +15,7 @@
 int main() {
     // GBA hardware initialization
     REG_DISPCNT = MODE_3 | BG2_ENABLE;
+    audio_init();
 
     // Game objects
     Grid grid;
@@ -32,6 +33,9 @@ int main() {
 
         // Clear screen to black
         memset((void*)0x06000000, 0, 240 * 160 * 2);
+
+        // Advance synthwave background music sequencer
+        audio_update();
 
         scanKeys();
 
@@ -52,6 +56,7 @@ int main() {
             // Check for tile interactions
             TileType currentTile = grid.getTile(players[i].getX(), players[i].getY());
             if (currentTile == TILE_NODE) {
+                play_payload_sound();
                 // Pick up a random payload
                 players[i].setPayload((Payload)(rand() % 3 + 1)); // PAYLOAD_FIREWALL, GLITCH, or SHIELD
                 // Relocate the node
@@ -59,6 +64,7 @@ int main() {
                 grid.setTile(rand() % (GRID_WIDTH - 2) + 1, rand() % (GRID_HEIGHT - 2) + 1, TILE_NODE);
 
             } else if (currentTile == TILE_NEUTRAL) {
+                play_capture_sound();
                 // Capture the tile
                 grid.setTile(players[i].getX(), players[i].getY(), (TileType)(TILE_CAPTURED_P1 + i));
                 players[i].increaseScore(10);
