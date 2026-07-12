@@ -4,6 +4,9 @@
 # This file is a part of the gridlock-808 project.
 #
 
+# Default devkitPro path if not set in the environment
+DEVKITPRO ?= /opt/devkitpro
+
 # The name of your desired target file (e.g., gridlock-808.gba)
 TARGET := gridlock-808
 
