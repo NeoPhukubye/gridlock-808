@@ -34,3 +34,7 @@ caddr_t _sbrk(int incr) {
     heap_end += incr;
     return (caddr_t)prev_heap_end;
 }
+
+// Global variable required by GBA crt0 startup code
+char *fake_heap_end = (char*)0x02040000;
+
