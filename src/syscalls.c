@@ -38,3 +38,8 @@ caddr_t _sbrk(int incr) {
 // Global variable required by GBA crt0 startup code
 char *fake_heap_end = (char*)0x02040000;
 
+// Dummy functions to resolve libc init/fini array references
+void _init(void) {}
+void _fini(void) {}
+
+
