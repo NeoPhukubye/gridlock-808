@@ -22,7 +22,7 @@ OBJS := $(patsubst %.cpp, %.o, $(SRCS))
 
 # Build flags
 ARCH := -mthumb -mthumb-interwork
-SPECS := -specs=$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba.specs
+SPECS := -specs=$(CURDIR)/gba.specs
 CFLAGS := $(ARCH) -O2 -Wall -fomit-frame-pointer -I$(DEVKITPRO)/libgba/include
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 LDFLAGS := $(SPECS) $(ARCH) -B$(DEVKITPRO)/devkitARM/lib/gcc/arm-none-eabi/16.1.0/ -B$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/ -T $(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-L$(DEVKITPRO)/devkitARM/arm-none-eabi/lib -Wl,-L$(DEVKITPRO)/libgba/lib -Wl,-Map,$(TARGET).map -lgba
