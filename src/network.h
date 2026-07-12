@@ -2,15 +2,40 @@
 #define NETWORK_H
 
 // GBA Hardware Registers for Serial Communication
-#define REG_SIOCNT *(volatile unsigned short*)0x4000128
-#define REG_SIODATA8 *(volatile unsigned char*)0x400012a
-#define REG_RCNT *(volatile unsigned short*)0x4000134
+#ifdef MOCK_GBA
+extern volatile unsigned short mock_REG_SIOCNT;
+extern volatile unsigned short mock_REG_SIOMLT_SEND;
+extern volatile unsigned short mock_REG_RCNT;
+extern volatile unsigned short mock_REG_SIOMULTI0;
+extern volatile unsigned short mock_REG_SIOMULTI1;
+extern volatile unsigned short mock_REG_SIOMULTI2;
+extern volatile unsigned short mock_REG_SIOMULTI3;
+
+#define REG_SIOCNT       mock_REG_SIOCNT
+#define REG_SIOMLT_SEND  mock_REG_SIOMLT_SEND
+#define REG_RCNT         mock_REG_RCNT
+#define REG_SIOMULTI0    mock_REG_SIOMULTI0
+#define REG_SIOMULTI1    mock_REG_SIOMULTI1
+#define REG_SIOMULTI2    mock_REG_SIOMULTI2
+#define REG_SIOMULTI3    mock_REG_SIOMULTI3
+#else
+#define REG_SIOCNT       *(volatile unsigned short*)0x04000128
+#define REG_SIOMLT_SEND  *(volatile unsigned short*)0x0400012a
+#define REG_RCNT         *(volatile unsigned short*)0x04000134
+#define REG_SIOMULTI0    *(volatile unsigned short*)0x04000120
+#define REG_SIOMULTI1    *(volatile unsigned short*)0x04000122
+#define REG_SIOMULTI2    *(volatile unsigned short*)0x04000124
+#define REG_SIOMULTI3    *(volatile unsigned short*)0x04000126
+#endif
 
 // SIO (Serial Input/Output) Control Bits
-#define SIO_MODE_MULTIPLAYER 0x3000 // Multi-Play Mode
-#define SIO_START 0x0080           // Start Transfer
-#define SIO_RDY 0x0004             // Ready Flag
-#define SIO_ERROR 0x0040           // Error Flag
+#define SIO_MODE_MULTIPLAYER 0x2000 // Multi-Play Mode (Mode 2)
+#define SIO_START            0x0080 // Start Transfer (Parent only)
+#define SIO_ERROR            0x0040 // Error Flag
+#define SIO_SI_TERMINAL      0x0004 // SI Terminal: 0=Parent, 1=Child
+#define SIO_SD_TERMINAL      0x0008 // SD Terminal: 1=Ready (all connected)
+#define SIO_ID_MASK          0x0030 // Multiplayer ID bits
+#define SIO_ID_SHIFT         4
 
 // Player Input Bitmasks (matches GBA's REG_KEYINPUT)
 #define KEY_A 1

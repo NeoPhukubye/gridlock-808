@@ -68,10 +68,16 @@ int main() {
         }
 
         // Display scores
-        char score_str[10];
+        char score_str[20];
+        int local_id = link_get_player_id();
         for (int i = 0; i < num_players; ++i) {
-            sprintf(score_str, "P%d: %d", i + 1, players[i].getScore());
-            draw_text(10, i * 10, score_str, RGB5(31, 31, 31));
+            if (i == local_id && num_players > 1) {
+                sprintf(score_str, "P%d*:%d", i + 1, players[i].getScore());
+                draw_text(10, i * 10, score_str, RGB5(10, 31, 10)); // Green for local player
+            } else {
+                sprintf(score_str, "P%d: %d", i + 1, players[i].getScore());
+                draw_text(10, i * 10, score_str, RGB5(31, 31, 31)); // White for others
+            }
         }
     }
 

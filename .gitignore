@@ -1,0 +1,9 @@
+# Build outputs
+*.gba
+*.elf
+*.map
+src/*.o
+mock_gba/*.o
+
+# Desktop simulation binary
+gridlock-mock
