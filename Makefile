@@ -14,7 +14,7 @@ TARGET := gridlock-808
 SRCDIR := src
 
 # The list of C++ source files
-CPP_FILES := main.cpp link.cpp player.cpp grid.cpp
+CPP_FILES := main.cpp link.cpp player.cpp grid.cpp text.cpp
 SRCS := $(addprefix $(SRCDIR)/, $(CPP_FILES))
 
 # The list of object files
@@ -22,10 +22,9 @@ OBJS := $(patsubst %.cpp, %.o, $(SRCS))
 
 # Build flags
 ARCH := -mthumb -mthumb-interwork
-SPECS := -specs=$(CURDIR)/gba.specs
 CFLAGS := $(ARCH) -O2 -Wall -fomit-frame-pointer -I$(DEVKITPRO)/libgba/include
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-LDFLAGS := $(SPECS) $(ARCH) -B$(DEVKITPRO)/devkitARM/lib/gcc/arm-none-eabi/16.1.0/ -B$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/ -T $(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-L$(DEVKITPRO)/devkitARM/arm-none-eabi/lib -Wl,-L$(DEVKITPRO)/libgba/lib -Wl,-Map,$(TARGET).map -lgba
+LDFLAGS := $(ARCH) -T$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-Map,$(TARGET).map -L$(DEVKITPRO)/libgba/lib -lgba -lc -lgcc -lnosys
 
 # The toolchain prefix
 PREFIX := arm-none-eabi-
