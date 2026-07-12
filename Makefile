@@ -24,7 +24,7 @@ OBJS := $(patsubst %.cpp, %.o, $(SRCS))
 ARCH := -mthumb -mthumb-interwork
 CFLAGS := $(ARCH) -O2 -Wall -fomit-frame-pointer -I$(DEVKITPRO)/libgba/include
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-LDFLAGS := $(ARCH) -T$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-Map,$(TARGET).map -L$(DEVKITPRO)/libgba/lib -lgba -lc -lgcc -lnosys
+LDFLAGS := $(ARCH) -T$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-Map,$(TARGET).map -L$(DEVKITPRO)/libgba/lib -lgba -lnosys -lc -lgcc
 
 # The toolchain prefix
 PREFIX := arm-none-eabi-
