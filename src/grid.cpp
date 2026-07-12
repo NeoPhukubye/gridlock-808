@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "network.h"
 #include <gba_video.h>
 
 Grid::Grid() {
