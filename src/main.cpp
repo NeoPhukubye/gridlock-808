@@ -111,7 +111,6 @@ int main() {
 
         // Display scores
         char score_str[20];
-        int local_id = link_get_player_id();
         for (int i = 0; i < num_players; ++i) {
             if (i == local_id && num_players > 1) {
                 sprintf(score_str, "P%d*:%d", i + 1, players[i].getScore());
