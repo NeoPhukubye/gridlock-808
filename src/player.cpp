@@ -85,90 +85,62 @@ void Player::render() {
         case 3: color = RGB5(31, 31, 10); break; // Glowing Yellow
     }
 
-    int px = x * 16;
-    int py = y * 16;
-
     // Apply visual glitch shift if glitched
     int x_shift = 0;
     int y_shift = 0;
     if (glitchEffectTimer > 0) {
-        // Shift left/right based on timer ticks to create a vibrating glitch effect
         x_shift = (glitchEffectTimer % 4 == 0) ? -2 : ((glitchEffectTimer % 4 == 2) ? 2 : 0);
         y_shift = (glitchEffectTimer % 3 == 0) ? -1 : ((glitchEffectTimer % 3 == 2) ? 1 : 0);
     }
 
-    px += x_shift;
-    py += y_shift;
+    // Project base corners of a 3D pyramid (triangle on the ground)
+    int bx0, by0, bx1, by1, bx2, by2;
+    project(2 * x + 1, 2 * y,     0, &bx0, &by0); // Far-middle of cell
+    project(2 * x,     2 * y + 2, 0, &bx1, &by1); // Near-left
+    project(2 * x + 2, 2 * y + 2, 0, &bx2, &by2); // Near-right
 
-    // 1. Draw corner brackets for the hacker avatar
-    // Top-Left
-    m3_plot(px + 2, py + 2, color);
-    m3_plot(px + 3, py + 2, color);
-    m3_plot(px + 4, py + 2, color);
-    m3_plot(px + 2, py + 3, color);
-    m3_plot(px + 2, py + 4, color);
+    // Project top tip of the pyramid (height 8)
+    int tx, ty;
+    project(2 * x + 1, 2 * y + 1, 8, &tx, &ty);
 
-    // Top-Right
-    m3_plot(px + 13, py + 2, color);
-    m3_plot(px + 12, py + 2, color);
-    m3_plot(px + 11, py + 2, color);
-    m3_plot(px + 13, py + 3, color);
-    m3_plot(px + 13, py + 4, color);
+    // Apply vibration shift
+    bx0 += x_shift; by0 += y_shift;
+    bx1 += x_shift; by1 += y_shift;
+    bx2 += x_shift; by2 += y_shift;
+    tx  += x_shift; ty  += y_shift;
 
-    // Bottom-Left
-    m3_plot(px + 2, py + 13, color);
-    m3_plot(px + 3, py + 13, color);
-    m3_plot(px + 4, py + 13, color);
-    m3_plot(px + 2, py + 12, color);
-    m3_plot(px + 2, py + 11, color);
+    // Draw base triangle
+    draw_line(bx0, by0, bx1, by1, color);
+    draw_line(bx1, by1, bx2, by2, color);
+    draw_line(bx2, by2, bx0, by0, color);
 
-    // Bottom-Right
-    m3_plot(px + 13, py + 13, color);
-    m3_plot(px + 12, py + 13, color);
-    m3_plot(px + 11, py + 13, color);
-    m3_plot(px + 13, py + 12, color);
-    m3_plot(px + 13, py + 11, color);
+    // Draw vertical edges linking base corners to top tip
+    draw_line(bx0, by0, tx, ty, color);
+    draw_line(bx1, by1, tx, ty, color);
+    draw_line(bx2, by2, tx, ty, color);
 
-    // 2. Draw crosshair center ticks
-    m3_plot(px + 8, py + 5, color);
-    m3_plot(px + 8, py + 6, color);
-    m3_plot(px + 8, py + 9, color);
-    m3_plot(px + 8, py + 10, color);
-    m3_plot(px + 5, py + 8, color);
-    m3_plot(px + 6, py + 8, color);
-    m3_plot(px + 9, py + 8, color);
-    m3_plot(px + 10, py + 8, color);
+    // Draw central white core dot
+    int cx, cy;
+    project(2 * x + 1, 2 * y + 1, 0, &cx, &cy);
+    cx += x_shift;
+    cy += y_shift;
+    m3_plot(cx, cy, RGB5(31, 31, 31));
 
-    // 3. Draw a solid central core (white)
-    m3_plot(px + 7, py + 7, RGB5(31, 31, 31));
-    m3_plot(px + 8, py + 7, RGB5(31, 31, 31));
-    m3_plot(px + 7, py + 8, RGB5(31, 31, 31));
-    m3_plot(px + 8, py + 8, RGB5(31, 31, 31));
-
-    // 4. Draw circular shield ring if shielded
+    // Draw glowing cyan floating shield triangle if shielded
     if (shielded) {
-        unsigned short shield_color = RGB5(0, 31, 31); // Glowing Cyan
-        
-        m3_plot(px + 8, py + 1, shield_color);
-        m3_plot(px + 7, py + 1, shield_color);
-        m3_plot(px + 9, py + 1, shield_color);
-        
-        m3_plot(px + 8, py + 14, shield_color);
-        m3_plot(px + 7, py + 14, shield_color);
-        m3_plot(px + 9, py + 14, shield_color);
-        
-        m3_plot(px + 1, py + 8, shield_color);
-        m3_plot(px + 1, py + 7, shield_color);
-        m3_plot(px + 1, py + 9, shield_color);
-        
-        m3_plot(px + 14, py + 8, shield_color);
-        m3_plot(px + 14, py + 7, shield_color);
-        m3_plot(px + 14, py + 9, shield_color);
+        unsigned short shield_color = RGB5(0, 31, 31);
+        int sx0, sy0, sx1, sy1, sx2, sy2;
+        project(2 * x + 1, 2 * y - 1, 5, &sx0, &sy0);
+        project(2 * x - 1, 2 * y + 3, 5, &sx1, &sy1);
+        project(2 * x + 3, 2 * y + 3, 5, &sx2, &sy2);
 
-        m3_plot(px + 3, py + 3, shield_color);
-        m3_plot(px + 12, py + 3, shield_color);
-        m3_plot(px + 3, py + 12, shield_color);
-        m3_plot(px + 12, py + 12, shield_color);
+        sx0 += x_shift; sy0 += y_shift;
+        sx1 += x_shift; sy1 += y_shift;
+        sx2 += x_shift; sy2 += y_shift;
+
+        draw_line(sx0, sy0, sx1, sy1, shield_color);
+        draw_line(sx1, sy1, sx2, sy2, shield_color);
+        draw_line(sx2, sy2, sx0, sy0, shield_color);
     }
 }
 

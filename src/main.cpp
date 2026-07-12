@@ -4,6 +4,7 @@
 #include <gba_input.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "grid.h"
 #include "player.h"
@@ -28,6 +29,10 @@ int main() {
         // Wait for VBlank (VSync)
         while (REG_VCOUNT >= 160);
         while (REG_VCOUNT < 160);
+
+        // Clear screen to black
+        memset((void*)0x06000000, 0, 240 * 160 * 2);
+
         scanKeys();
 
         // Get local input

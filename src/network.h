@@ -27,10 +27,48 @@ extern volatile unsigned short mock_REG_SIOMULTI3;
 #define REG_SIOMULTI2    *(volatile unsigned short*)0x04000124
 #define REG_SIOMULTI3    *(volatile unsigned short*)0x04000126
 
-// GBA Mode 3 Framebuffer and pixel plot helper
+// GBA Mode 3 Framebuffer and pixel plot helper with safety clipping bounds
 #define MEM_VRAM ((volatile unsigned short*)0x06000000)
 static inline void m3_plot(int x, int y, unsigned short color) {
-    MEM_VRAM[y * 240 + x] = color;
+    if (x >= 0 && x < 240 && y >= 0 && y < 160) {
+        MEM_VRAM[y * 240 + x] = color;
+    }
+}
+
+// Fast integer-only Bresenham's line drawing algorithm
+static inline void draw_line(int x0, int y0, int x1, int y1, unsigned short color) {
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int adx = dx < 0 ? -dx : dx;
+    int ady = dy < 0 ? -dy : dy;
+    int sx = x0 < x1 ? 1 : -1;
+    int sy = y0 < y1 ? 1 : -1;
+    int err = adx - ady;
+
+    while (1) {
+        m3_plot(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if (e2 > -ady) {
+            err -= ady;
+            x0 += sx;
+        }
+        if (e2 < adx) {
+            err += adx;
+            y0 += sy;
+        }
+    }
+}
+
+// 3D perspective projection helper using half-grid units (each cell is 2x2 units)
+static inline void project(int gx_half, int gy_half, int height, int* sx, int* sy) {
+    int x_3d = (gx_half - 14) * 10;      // Center is gx_half=14 (gx=7). Spacing is 10 units.
+    int z_3d = 170 - (gy_half * 11) / 2; // gy_half=0 (far, z=170), gy_half=20 (near, z=60)
+    int y_3d = 45 - height;              // Height from ground plane
+
+    // Projection centered at vanishing point (120, 75)
+    *sx = 120 + (x_3d * 120) / z_3d;
+    *sy = 75 + (y_3d * 120) / z_3d;
 }
 #endif
 
