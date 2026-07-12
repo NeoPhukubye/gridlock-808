@@ -33,15 +33,17 @@ int main() {
 
         // Update all players
         for (int i = 0; i < num_players; ++i) {
-            players[i].update(inputs[i]);
+            players[i].update(inputs[i], grid);
         }
 
         // Update grid logic
         grid.update();
 
-.
         // Render the game state
         grid.render();
+        for (int i = 0; i < num_players; ++i) {
+            players[i].render();
+        }
     }
 
     return 0;

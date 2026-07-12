@@ -1,8 +1,6 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "player.h"
-
 #define GRID_WIDTH 15
 #define GRID_HEIGHT 10
 

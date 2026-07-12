@@ -3,6 +3,9 @@
 
 #include "network.h"
 
+// Forward declaration of the Grid class to avoid circular dependency
+class Grid;
+
 // Payload types
 enum Payload {
     PAYLOAD_NONE,
@@ -15,8 +18,10 @@ class Player {
 public:
     Player(int id);
 
-    void update(unsigned short input);
-    void usePayload();
+    void update(unsigned short input, Grid& grid);
+    void usePayload(Grid& grid);
+    void render();
+    void setPayload(Payload p);
 
     int getX() const;
     int getY() const;
