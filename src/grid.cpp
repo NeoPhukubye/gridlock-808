@@ -22,14 +22,12 @@ Grid::Grid() {
         int rx = rand() % (GRID_WIDTH - 2) + 1;
         int ry = rand() % (GRID_HEIGHT - 2) + 1;
 
-        // Skip spawn points and central node
-        if ((rx == 1 && ry == 1) ||
-            (rx == GRID_WIDTH - 2 && ry == 1) ||
-            (rx == 1 && ry == GRID_HEIGHT - 2) ||
-            (rx == GRID_WIDTH - 2 && ry == GRID_HEIGHT - 2) ||
-            (rx == GRID_WIDTH / 2 && ry == GRID_HEIGHT / 2)) {
-            continue;
-        }
+        // Skip spawn points and their adjacent 3x3 tiles, and the central node
+        if (abs(rx - 1) <= 1 && abs(ry - 1) <= 1) continue; // P1 area
+        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - 1) <= 1) continue; // P2 area
+        if (abs(rx - 1) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue; // P3 area
+        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue; // P4 area
+        if (rx == GRID_WIDTH / 2 && ry == GRID_HEIGHT / 2) continue; // Central node
 
         // Place obstacle if cell is neutral
         if (tiles[rx][ry] == TILE_NEUTRAL) {

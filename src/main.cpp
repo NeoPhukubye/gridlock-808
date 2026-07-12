@@ -68,8 +68,29 @@ int main() {
             }
         }
 
-        // Get local input
-        unsigned short my_input = keysDown();
+        // Get local input with smooth repeating (hold keys to walk)
+        static int move_delay = 0;
+        unsigned short my_input = 0;
+
+        if (held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) {
+            if (move_delay == 0) {
+                my_input = held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT);
+                move_delay = 8; // Repeat move every 8 frames (7.5 steps/sec)
+            } else {
+                move_delay--;
+            }
+        } else {
+            move_delay = 0; // Reset delay when keys are released
+        }
+
+        // Also register instant moves on initial key press
+        if (pressed & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) {
+            my_input = pressed & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT);
+            move_delay = 8;
+        }
+
+        // Include any action button presses (A button) instantly
+        my_input |= (pressed & KEY_A);
 
         // Synchronize inputs with other players
         num_players = link_sync_inputs(my_input, inputs);
