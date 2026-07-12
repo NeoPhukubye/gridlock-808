@@ -47,8 +47,8 @@ void Grid::render() {
     static int frame = 0;
     frame++;
 
-    // 1. Draw neon horizon line in magenta/purple
-    draw_line(0, 75, 239, 75, RGB5(12, 0, 12));
+    // 1. Draw neon horizon line in magenta/purple (at y=80)
+    draw_line(0, 80, 239, 80, RGB5(12, 0, 12));
 
     // 2. Trigonometric tables (sine/cosine scaled by 256) for octahedron rotation
     static const int sin_tbl[] = {0, 181, 256, 181, 0, -181, -256, -181};
@@ -122,7 +122,7 @@ void Grid::render() {
                 project(2 * x + 1, 2 * y + 1, 10, &ttx, &tty);
                 project(2 * x + 1, 2 * y + 1, 0,  &btx, &bty);
 
-                // Compute 4 rotated middle vertices in X-Z space (radius 6)
+                // Compute 4 rotated middle vertices in X-Z space (radius 7)
                 int mx[4], my[4];
                 for (int i = 0; i < 4; i++) {
                     int idx = (rot_idx + i * 2) % 8;
@@ -131,11 +131,11 @@ void Grid::render() {
 
                     // Direct 3D calculations for offset point
                     int px_3d = (2 * x + 1 - 14) * 10 + dx;
-                    int pz_3d = 170 - ((2 * y + 1) * 11) / 2 + dz;
-                    int py_3d = 45 - 5; // Float height 5
+                    int pz_3d = 140 - ((2 * y + 1) * 7) / 2 + dz;
+                    int py_3d = 40 - 5; // Float height 5
 
                     mx[i] = 120 + (px_3d * 120) / pz_3d;
-                    my[i] = 75 + (py_3d * 120) / pz_3d;
+                    my[i] = 80 + (py_3d * 120) / pz_3d;
                 }
 
                 unsigned short core_color = RGB5(0, 31, 31);   // Glowing Cyan
@@ -151,6 +151,10 @@ void Grid::render() {
                 draw_line(mx[1], my[1], mx[2], my[2], inner_color);
                 draw_line(mx[2], my[2], mx[3], my[3], inner_color);
                 draw_line(mx[3], my[3], mx[0], my[0], inner_color);
+
+                // Draw high-visibility vertical laser beacon shooting into the sky
+                draw_line(ttx, tty, ttx, 15, RGB5(0, 20, 20)); // Dimmer cyan laser beam
+                m3_plot(ttx, 15, RGB5(0, 31, 31)); // Bright tip
 
             } else {
                 // Captured tiles: TILE_CAPTURED_P1 to P4
@@ -214,6 +218,57 @@ void Grid::render() {
             }
         }
     }
+
+    // 4. Render 2D Minimap Radar in the top-right corner
+    int rx_start = 190;
+    int ry_start = 5;
+
+    // Draw dark radar background
+    for (int rx = rx_start - 1; rx < rx_start + GRID_WIDTH * 3 + 1; rx++) {
+        for (int ry = ry_start - 1; ry < ry_start + GRID_HEIGHT * 3 + 1; ry++) {
+            m3_plot(rx, ry, RGB5(1, 1, 3));
+        }
+    }
+
+    // Draw radar borders in dim teal
+    draw_line(rx_start - 2, ry_start - 2, rx_start + GRID_WIDTH * 3 + 1, ry_start - 2, RGB5(6, 9, 13));
+    draw_line(rx_start - 2, ry_start + GRID_HEIGHT * 3 + 1, rx_start + GRID_WIDTH * 3 + 1, ry_start + GRID_HEIGHT * 3 + 1, RGB5(6, 9, 13));
+    draw_line(rx_start - 2, ry_start - 2, rx_start - 2, ry_start + GRID_HEIGHT * 3 + 1, RGB5(6, 9, 13));
+    draw_line(rx_start + GRID_WIDTH * 3 + 1, ry_start - 2, rx_start + GRID_WIDTH * 3 + 1, ry_start + GRID_HEIGHT * 3 + 1, RGB5(6, 9, 13));
+
+    // Draw elements on minimap
+    for (int y = 0; y < GRID_HEIGHT; ++y) {
+        for (int x = 0; x < GRID_WIDTH; ++x) {
+            TileType t = tiles[x][y];
+            int px = rx_start + x * 3;
+            int py = ry_start + y * 3;
+
+            if (t == TILE_NODE) {
+                // Pulsing core dot (2x2)
+                unsigned short c_color = (frame % 16 < 8) ? RGB5(0, 31, 31) : RGB5(31, 31, 31);
+                m3_plot(px, py, c_color);
+                m3_plot(px + 1, py, c_color);
+                m3_plot(px, py + 1, c_color);
+                m3_plot(px + 1, py + 1, c_color);
+            } else if (t == TILE_FIREWALL) {
+                // Dim red dot for static obstacles (exclude borders to keep it clean)
+                if (x > 0 && x < GRID_WIDTH - 1 && y > 0 && y < GRID_HEIGHT - 1) {
+                    m3_plot(px + 1, py + 1, RGB5(16, 0, 0));
+                }
+            } else if (t >= TILE_CAPTURED_P1 && t <= TILE_CAPTURED_P4) {
+                // Dim player color dot
+                unsigned short cap_color = 0;
+                switch(t - TILE_CAPTURED_P1) {
+                    case 0: cap_color = RGB5(12, 0, 0); break;
+                    case 1: cap_color = RGB5(0, 0, 12); break;
+                    case 2: cap_color = RGB5(0, 12, 0); break;
+                    case 3: cap_color = RGB5(12, 12, 0); break;
+                }
+                m3_plot(px + 1, py + 1, cap_color);
+            }
+        }
+    }
+}
 }
 
 bool Grid::isMoveValid(int x, int y) const {

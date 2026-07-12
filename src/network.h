@@ -60,15 +60,15 @@ static inline void draw_line(int x0, int y0, int x1, int y1, unsigned short colo
     }
 }
 
-// 3D perspective projection helper using half-grid units (each cell is 2x2 units)
+// 3D perspective projection helper using half-grid units with wider depth scaling
 static inline void project(int gx_half, int gy_half, int height, int* sx, int* sy) {
-    int x_3d = (gx_half - 14) * 10;      // Center is gx_half=14 (gx=7). Spacing is 10 units.
-    int z_3d = 170 - (gy_half * 11) / 2; // gy_half=0 (far, z=170), gy_half=20 (near, z=60)
-    int y_3d = 45 - height;              // Height from ground plane
+    int x_3d = (gx_half - 14) * 10;     // Center is gx_half=14. Spacing is 10.
+    int z_3d = 140 - (gy_half * 7) / 2; // gy_half=0 (far, z=140), gy_half=20 (near, z=70)
+    int y_3d = 40 - height;             // Ground plane height
 
-    // Projection centered at vanishing point (120, 75)
+    // Projection centered at vanishing point (120, 80)
     *sx = 120 + (x_3d * 120) / z_3d;
-    *sy = 75 + (y_3d * 120) / z_3d;
+    *sy = 80 + (y_3d * 120) / z_3d;
 }
 #endif
 

@@ -119,12 +119,32 @@ void Player::render() {
     draw_line(bx1, by1, tx, ty, color);
     draw_line(bx2, by2, tx, ty, color);
 
+    // Draw thin vertical location beacon shooting up from the player avatar
+    unsigned short beacon_color = 0;
+    switch (playerId) {
+        case 0: beacon_color = RGB5(12, 3, 3); break;  // Dim red
+        case 1: beacon_color = RGB5(3, 6, 12); break;  // Dim blue
+        case 2: beacon_color = RGB5(3, 12, 3); break;  // Dim green
+        case 3: beacon_color = RGB5(12, 12, 3); break; // Dim yellow
+    }
+    draw_line(tx, ty, tx, 15, beacon_color);
+
     // Draw central white core dot
     int cx, cy;
     project(2 * x + 1, 2 * y + 1, 0, &cx, &cy);
     cx += x_shift;
     cy += y_shift;
     m3_plot(cx, cy, RGB5(31, 31, 31));
+
+    // Draw player position on the minimap radar (2x2 dot)
+    int rx_start = 190;
+    int ry_start = 5;
+    int mpx = rx_start + x * 3;
+    int mpy = ry_start + y * 3;
+    m3_plot(mpx, mpy, color);
+    m3_plot(mpx + 1, mpy, color);
+    m3_plot(mpx, mpy + 1, color);
+    m3_plot(mpx + 1, mpy + 1, color);
 
     // Draw glowing cyan floating shield triangle if shielded
     if (shielded) {
