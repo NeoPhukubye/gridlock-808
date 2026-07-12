@@ -105,8 +105,8 @@ enum LinkState {
 // GBA PSG Legacy Audio system helpers
 static inline void audio_init() {
     *(volatile unsigned short*)0x04000084 = 0x0080; // Master Sound Enable (Bit 7)
-    *(volatile unsigned short*)0x04000080 = 0x0077; // Max Volume left/right for DMG channels
-    *(volatile unsigned short*)0x04000082 = 0x00FF; // Enable DMG mixer channels
+    *(volatile unsigned short*)0x04000080 = 0xFF77; // Enable channels 1-4 for left & right speakers (stereo), max volume
+    *(volatile unsigned short*)0x04000082 = 0x0002; // Set PSG mix ratio to 100% (volume boost)
 }
 
 static inline void play_move_sound() {
