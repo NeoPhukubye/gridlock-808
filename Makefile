@@ -51,7 +51,7 @@ $(GBA_FILE): $(ELF_FILE)
 
 $(ELF_FILE): $(OBJS)
 	@echo "Linking..."
-	@$(LD) $^ $(LDFLAGS) -o $@
+	@$(LD) $(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_crt0.o $^ $(LDFLAGS) -o $@
 
 %.o: %.cpp
 	@echo "Compiling $<..."
