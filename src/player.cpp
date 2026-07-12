@@ -2,7 +2,7 @@
 #include "grid.h"
 #include <gba_video.h>
 
-Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), shieldTimer(0), glitchEffectTimer(0), lastDirection(DIR_DOWN) {
+Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), shieldTimer(0), glitchEffectTimer(0), lastDirection(DIR_DOWN), infiniteShield(false), hyperSpeed(false) {
     // Initialize player position based on ID
     switch (playerId) {
         case 0: x = 1; y = 1; break;
@@ -13,36 +13,44 @@ Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYL
 }
 
 void Player::update(unsigned short input, Grid& grid) {
-    int newX = x;
-    int newY = y;
-
-    if (glitchEffectTimer > 0) {
-        glitchEffectTimer--;
-        // Invert controls during glitch
-        if (input & KEY_UP) { newY++; lastDirection = DIR_UP; }
-        if (input & KEY_DOWN) { newY--; lastDirection = DIR_DOWN; }
-        if (input & KEY_LEFT) { newX++; lastDirection = DIR_LEFT; }
-        if (input & KEY_RIGHT) { newX--; lastDirection = DIR_RIGHT; }
-    } else {
-        if (input & KEY_UP) { newY--; lastDirection = DIR_UP; }
-        if (input & KEY_DOWN) { newY++; lastDirection = DIR_DOWN; }
-        if (input & KEY_LEFT) { newX--; lastDirection = DIR_LEFT; }
-        if (input & KEY_RIGHT) { newX++; lastDirection = DIR_RIGHT; }
+    if (infiniteShield) {
+        shielded = true;
+        shieldTimer = 30;
     }
 
-    if (shieldTimer > 0) {
+    int steps = (hyperSpeed) ? 2 : 1;
+    for (int step = 0; step < steps; ++step) {
+        int newX = x;
+        int newY = y;
+
+        if (glitchEffectTimer > 0) {
+            if (step == 0) glitchEffectTimer--; // Only decrement timer once per frame
+            // Invert controls during glitch
+            if (input & KEY_UP) { newY++; lastDirection = DIR_UP; }
+            if (input & KEY_DOWN) { newY--; lastDirection = DIR_DOWN; }
+            if (input & KEY_LEFT) { newX++; lastDirection = DIR_LEFT; }
+            if (input & KEY_RIGHT) { newX--; lastDirection = DIR_RIGHT; }
+        } else {
+            if (input & KEY_UP) { newY--; lastDirection = DIR_UP; }
+            if (input & KEY_DOWN) { newY++; lastDirection = DIR_DOWN; }
+            if (input & KEY_LEFT) { newX--; lastDirection = DIR_LEFT; }
+            if (input & KEY_RIGHT) { newX++; lastDirection = DIR_RIGHT; }
+        }
+
+        if (grid.isMoveValid(newX, newY)) {
+            if (newX != x || newY != y) {
+                play_move_sound();
+            }
+            x = newX;
+            y = newY;
+        }
+    }
+
+    if (!infiniteShield && shieldTimer > 0) {
         shieldTimer--;
         if (shieldTimer == 0) {
             shielded = false;
         }
-    }
-
-    if (grid.isMoveValid(newX, newY)) {
-        if (newX != x || newY != y) {
-            play_move_sound();
-        }
-        x = newX;
-        y = newY;
     }
 }
 
@@ -186,3 +194,24 @@ int Player::getY() const { return y; }
 int Player::getScore() const { return score; }
 int Player::getPlayerId() const { return playerId; }
 bool Player::isShielded() const { return shielded; }
+
+void Player::toggleInfiniteShield() {
+    infiniteShield = !infiniteShield;
+    if (!infiniteShield) {
+        shielded = false;
+        shieldTimer = 0;
+    }
+}
+
+void Player::toggleHyperSpeed() {
+    hyperSpeed = !hyperSpeed;
+}
+
+bool Player::isHyperSpeed() const {
+    return hyperSpeed;
+}
+
+void Player::teleportTo(int tx, int ty) {
+    x = tx;
+    y = ty;
+}

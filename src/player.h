@@ -39,6 +39,11 @@ public:
     bool isShielded() const;
     void activateGlitch(int duration);
 
+    void toggleInfiniteShield();
+    void toggleHyperSpeed();
+    bool isHyperSpeed() const;
+    void teleportTo(int tx, int ty);
+
 private:
     int playerId;
     int x, y; // Position on the grid
@@ -48,6 +53,8 @@ private:
     int shieldTimer;
     int glitchEffectTimer;
     Direction lastDirection;
+    bool infiniteShield;
+    bool hyperSpeed;
 };
 
 #endif // PLAYER_H

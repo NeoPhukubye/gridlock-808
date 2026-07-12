@@ -39,6 +39,35 @@ int main() {
 
         scanKeys();
 
+        // Check for local developer cheats
+        int local_id = link_get_player_id();
+        unsigned short held = keysHeld();
+        unsigned short pressed = keysDown();
+
+        if (held & KEY_SELECT) {
+            if (pressed & KEY_R) {
+                players[local_id].toggleInfiniteShield();
+                play_payload_sound(); // Play chime confirmation
+            }
+            if (pressed & KEY_L) {
+                players[local_id].toggleHyperSpeed();
+                play_payload_sound(); // Play chime confirmation
+            }
+            if (pressed & KEY_START) {
+                int px = players[local_id].getX();
+                int py = players[local_id].getY();
+                for (int ny = 0; ny < GRID_HEIGHT; ++ny) {
+                    for (int nx = 0; nx < GRID_WIDTH; ++nx) {
+                        if (grid.getTile(nx, ny) == TILE_NODE) {
+                            grid.setTile(nx, ny, TILE_NEUTRAL);
+                        }
+                    }
+                }
+                grid.setTile(px, py, TILE_NODE);
+                play_payload_sound(); // Play chime confirmation
+            }
+        }
+
         // Get local input
         unsigned short my_input = keysDown();
 
