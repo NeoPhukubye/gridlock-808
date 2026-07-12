@@ -26,6 +26,12 @@ extern volatile unsigned short mock_REG_SIOMULTI3;
 #define REG_SIOMULTI1    *(volatile unsigned short*)0x04000122
 #define REG_SIOMULTI2    *(volatile unsigned short*)0x04000124
 #define REG_SIOMULTI3    *(volatile unsigned short*)0x04000126
+
+// GBA Mode 3 Framebuffer and pixel plot helper
+#define MEM_VRAM ((volatile unsigned short*)0x06000000)
+static inline void m3_plot(int x, int y, unsigned short color) {
+    MEM_VRAM[y * 240 + x] = color;
+}
 #endif
 
 // SIO (Serial Input/Output) Control Bits
