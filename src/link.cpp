@@ -1,4 +1,5 @@
 #include "network.h"
+#include "link.h"
 
 // Placeholder for low-level GBA link state
 static LinkState currentLinkState = LINK_STATE_INIT;
