@@ -15,16 +15,17 @@ SRCDIR := src
 
 # The list of C++ source files
 CPP_FILES := main.cpp link.cpp player.cpp grid.cpp text.cpp
-SRCS := $(addprefix $(SRCDIR)/, $(CPP_FILES))
+C_FILES := syscalls.c
+SRCS := $(addprefix $(SRCDIR)/, $(CPP_FILES)) $(addprefix $(SRCDIR)/, $(C_FILES))
 
 # The list of object files
-OBJS := $(patsubst %.cpp, %.o, $(SRCS))
+OBJS := $(patsubst %.cpp, %.o, $(filter %.cpp, $(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
 
 # Build flags
 ARCH := -mthumb -mthumb-interwork
 CFLAGS := $(ARCH) -O2 -Wall -fomit-frame-pointer -I$(DEVKITPRO)/libgba/include
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-LDFLAGS := $(ARCH) -T$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-Map,$(TARGET).map -L$(DEVKITPRO)/libgba/lib -lgba -lnosys -lc -lgcc
+LDFLAGS := $(ARCH) -T$(DEVKITPRO)/devkitARM/arm-none-eabi/lib/gba_cart.ld -Wl,-Map,$(TARGET).map -L$(DEVKITPRO)/libgba/lib -lgba -lc -lgcc
 
 # The toolchain prefix
 PREFIX := arm-none-eabi-
@@ -55,6 +56,10 @@ $(ELF_FILE): $(OBJS)
 %.o: %.cpp
 	@echo "Compiling $<..."
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.c
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo "Cleaning up..."
