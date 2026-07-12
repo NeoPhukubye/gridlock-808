@@ -14,6 +14,14 @@ enum Payload {
     PAYLOAD_SHIELD
 };
 
+// Player direction
+enum Direction {
+    DIR_UP,
+    DIR_DOWN,
+    DIR_LEFT,
+    DIR_RIGHT
+};
+
 class Player {
 public:
     Player(int id);
@@ -36,6 +44,7 @@ private:
     Payload currentPayload;
     bool shielded;
     int glitchEffectTimer;
+    Direction lastDirection;
 };
 
 #endif // PLAYER_H

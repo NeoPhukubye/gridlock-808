@@ -2,7 +2,7 @@
 #include "grid.h"
 #include <gba_video.h>
 
-Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), glitchEffectTimer(0) {
+Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), glitchEffectTimer(0), lastDirection(DIR_DOWN) {
     // Initialize player position based on ID
     switch (playerId) {
         case 0: x = 1; y = 1; break;
@@ -19,15 +19,15 @@ void Player::update(unsigned short input, Grid& grid) {
     if (glitchEffectTimer > 0) {
         glitchEffectTimer--;
         // Invert controls during glitch
-        if (input & KEY_UP) newY++;
-        if (input & KEY_DOWN) newY--;
-        if (input & KEY_LEFT) newX++;
-        if (input & KEY_RIGHT) newX--;
+        if (input & KEY_UP) { newY++; lastDirection = DIR_UP; }
+        if (input & KEY_DOWN) { newY--; lastDirection = DIR_DOWN; }
+        if (input & KEY_LEFT) { newX++; lastDirection = DIR_LEFT; }
+        if (input & KEY_RIGHT) { newX--; lastDirection = DIR_RIGHT; }
     } else {
-        if (input & KEY_UP) newY--;
-        if (input & KEY_DOWN) newY++;
-        if (input & KEY_LEFT) newX--;
-        if (input & KEY_RIGHT) newX++;
+        if (input & KEY_UP) { newY--; lastDirection = DIR_UP; }
+        if (input & KEY_DOWN) { newY++; lastDirection = DIR_DOWN; }
+        if (input & KEY_LEFT) { newX--; lastDirection = DIR_LEFT; }
+        if (input & KEY_RIGHT) { newX++; lastDirection = DIR_RIGHT; }
     }
 
     if (grid.isMoveValid(newX, newY)) {
@@ -42,11 +42,20 @@ void Player::update(unsigned short input, Grid& grid) {
 
 void Player::usePayload(Grid& grid) {
     switch (currentPayload) {
-        case PAYLOAD_FIREWALL:
-            // Place a firewall in the direction the player is facing
-            // This is a simplified implementation
-            grid.setTile(x, y - 1, TILE_FIREWALL);
+        case PAYLOAD_FIREWALL: {
+            int targetX = x;
+            int targetY = y;
+            switch (lastDirection) {
+                case DIR_UP: targetY--; break;
+                case DIR_DOWN: targetY++; break;
+                case DIR_LEFT: targetX--; break;
+                case DIR_RIGHT: targetX++; break;
+            }
+            if (grid.getTile(targetX, targetY) == TILE_NEUTRAL) {
+                grid.setTile(targetX, targetY, TILE_FIREWALL);
+            }
             break;
+        }
         case PAYLOAD_GLITCH:
             // In a real multiplayer game, this would send a glitch packet
             // to other players. For now, it does nothing.
@@ -61,7 +70,7 @@ void Player::usePayload(Grid& grid) {
 }
 
 void Player::render() {
-    // Placeholder to render the player as a pixel on the screen
+    // Placeholder to render the player as a 4x4 square on the screen
     // This would be replaced with sprite rendering in a real game
     unsigned short player_color = 0;
     switch(playerId) {
@@ -70,7 +79,13 @@ void Player::render() {
         case 2: player_color = RGB5(0, 31, 0); break; // Green
         case 3: player_color = RGB5(31, 31, 0); break; // Yellow
     }
-    m3_plot(x * 16, y * 16, player_color);
+
+    // Draw a 4x4 square for the player
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            m3_plot((x * 16) + i + 6, (y * 16) + j + 6, player_color);
+        }
+    }
 }
 
 void Player::setPayload(Payload p) {
