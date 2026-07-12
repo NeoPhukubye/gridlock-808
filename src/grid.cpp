@@ -269,7 +269,6 @@ void Grid::render() {
         }
     }
 }
-}
 
 bool Grid::isMoveValid(int x, int y) const {
     if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) {
