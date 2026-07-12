@@ -1,6 +1,6 @@
 #include <gba_base.h>
 #include <gba_video.h>
-#include <gba_system.h>
+#include <gba_systemcalls.h>
 #include <gba_input.h>
 #include <stdlib.h>
 #include <stdio.h>
