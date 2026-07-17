@@ -38,6 +38,7 @@ public:
     int getScore() const;
     int getPlayerId() const;
     bool isShielded() const;
+    Payload getPayload() const;
     void activateGlitch(int duration);
 
     void toggleInfiniteShield();

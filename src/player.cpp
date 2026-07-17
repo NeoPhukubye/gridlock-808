@@ -76,7 +76,14 @@ void Player::usePayload(Grid& grid, Player players[], int num_players) {
         case PAYLOAD_GLITCH:
             for (int i = 0; i < num_players; ++i) {
                 if (players[i].getPlayerId() != playerId) {
-                    players[i].activateGlitch(120); // 2 seconds
+                    // Proximity-based: only affect players within GLITCH_RANGE tiles
+                    int dx = players[i].getX() - x;
+                    int dy = players[i].getY() - y;
+                    if (dx < 0) dx = -dx;
+                    if (dy < 0) dy = -dy;
+                    if (dx + dy <= GLITCH_RANGE) {
+                        players[i].activateGlitch(120);
+                    }
                 }
             }
             break;
@@ -197,6 +204,7 @@ int Player::getY() const { return y; }
 int Player::getScore() const { return score; }
 int Player::getPlayerId() const { return playerId; }
 bool Player::isShielded() const { return shielded; }
+Payload Player::getPayload() const { return currentPayload; }
 
 void Player::toggleInfiniteShield() {
     infiniteShield = !infiniteShield;

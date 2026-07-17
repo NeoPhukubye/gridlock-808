@@ -14,7 +14,7 @@ TARGET := gridlock-808
 SRCDIR := src
 
 # The list of C++ source files
-CPP_FILES := main.cpp link.cpp player.cpp grid.cpp text.cpp
+CPP_FILES := main.cpp link.cpp player.cpp grid.cpp text.cpp audio.cpp
 C_FILES := syscalls.c
 SRCS := $(addprefix $(SRCDIR)/, $(CPP_FILES)) $(addprefix $(SRCDIR)/, $(C_FILES))
 
@@ -72,6 +72,8 @@ run: $(GBA_FILE)
 	@mgba $(GBA_FILE)
 
 # Phony target for debugging
+debug: CXXFLAGS += -DDEBUG
+debug: CFLAGS += -DDEBUG
 debug: $(GBA_FILE)
 	@echo "Running in mGBA with debugging enabled..."
 	@mgba -d $(GBA_FILE)

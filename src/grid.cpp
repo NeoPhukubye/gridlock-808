@@ -39,7 +39,30 @@ Grid::Grid() {
 }
 
 void Grid::update() {
-    // Game logic for the grid, e.g., decaying tiles
+    static int decay_timer = 0;
+    decay_timer++;
+
+    // Every 5 seconds, one random captured tile decays back to neutral
+    if (decay_timer >= 300) {
+        decay_timer = 0;
+        // Collect all captured tiles
+        int cx[GRID_WIDTH * GRID_HEIGHT];
+        int cy[GRID_WIDTH * GRID_HEIGHT];
+        int count = 0;
+        for (int y = 1; y < GRID_HEIGHT - 1; y++) {
+            for (int x = 1; x < GRID_WIDTH - 1; x++) {
+                if (tiles[x][y] >= TILE_CAPTURED_P1 && tiles[x][y] <= TILE_CAPTURED_P4) {
+                    cx[count] = x;
+                    cy[count] = y;
+                    count++;
+                }
+            }
+        }
+        if (count > 0) {
+            int idx = rand() % count;
+            tiles[cx[idx]][cy[idx]] = TILE_NEUTRAL;
+        }
+    }
 }
 
 void Grid::render() {
