@@ -3,6 +3,7 @@
 #include <gba_systemcalls.h>
 #include <gba_input.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "render.h"

@@ -2,6 +2,8 @@
 *.gba
 *.elf
 *.map
+*.sav
+*.ss*
 src/*.o
 mock_gba/*.o
 
