@@ -1,6 +1,5 @@
 #include "text.h"
 #include "render.h"
-#include <gba_video.h>
 #include <string.h>
 
 static const unsigned char font_data[][8] = {

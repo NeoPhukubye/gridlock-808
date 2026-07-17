@@ -1,5 +1,4 @@
 #include <gba_base.h>
-#include <gba_video.h>
 #include <gba_systemcalls.h>
 #include <gba_input.h>
 #include <stdlib.h>
@@ -14,8 +13,10 @@
 #include "link.h"
 #include "text.h"
 
-// VBlank register
+// VBlank register (use libgba's if available)
+#ifndef REG_VCOUNT
 #define REG_VCOUNT (*(volatile unsigned short*)0x04000006)
+#endif
 
 static GameState gameState = STATE_TITLE;
 static int stateTimer = 0;

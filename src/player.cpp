@@ -3,7 +3,6 @@
 #include "render.h"
 #include "audio.h"
 #include "game_state.h"
-#include <gba_video.h>
 
 Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), shieldTimer(0), glitchEffectTimer(0), lastDirection(DIR_DOWN), infiniteShield(false), hyperSpeed(false) {
     // Initialize player position based on ID

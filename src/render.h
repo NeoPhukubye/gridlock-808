@@ -12,7 +12,9 @@
 #define VRAM_PAGE_1 ((volatile unsigned short*)0x0600A000)
 
 // RGB color macro
+#ifndef RGB5
 #define RGB5(r, g, b) ((r) | ((g) << 5) | ((b) << 10))
+#endif
 
 // Plot a single pixel with bounds clipping
 static inline void m3_plot(int x, int y, unsigned short color) {
