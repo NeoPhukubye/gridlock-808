@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "network.h"
+#include "game_state.h"
 
 // Forward declaration of the Grid class to avoid circular dependency
 class Grid;

@@ -1,5 +1,5 @@
 #include "text.h"
-#include "network.h"
+#include "render.h"
 #include <gba_video.h>
 #include <string.h>
 

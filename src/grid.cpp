@@ -1,5 +1,6 @@
 #include "grid.h"
-#include "network.h"
+#include "render.h"
+#include "game_state.h"
 #include <gba_video.h>
 #include <stdlib.h>
 

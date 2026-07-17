@@ -1,0 +1,21 @@
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
+
+// Game configuration
+#define GAME_DURATION_SECONDS 90
+#define GAME_FPS 60
+#define GAME_DURATION_FRAMES (GAME_DURATION_SECONDS * GAME_FPS)
+#define COUNTDOWN_SECONDS 3
+#define NODE_COUNT_INITIAL 3
+#define GLITCH_RANGE 5
+
+// Game states
+enum GameState {
+    STATE_TITLE,
+    STATE_WAITING_LINK,
+    STATE_COUNTDOWN,
+    STATE_PLAYING,
+    STATE_GAME_OVER
+};
+
+#endif // GAME_STATE_H
