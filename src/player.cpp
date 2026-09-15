@@ -5,7 +5,24 @@
 #include "game_state.h"
 
 Player::Player(int id) : playerId(id), x(0), y(0), score(0), currentPayload(PAYLOAD_NONE), shielded(false), shieldTimer(0), glitchEffectTimer(0), lastDirection(DIR_DOWN), infiniteShield(false), hyperSpeed(false) {
-    // Initialize player position based on ID
+    switch (playerId) {
+        case 0: x = 1; y = 1; break;
+        case 1: x = GRID_WIDTH - 2; y = 1; break;
+        case 2: x = 1; y = GRID_HEIGHT - 2; break;
+        case 3: x = GRID_WIDTH - 2; y = GRID_HEIGHT - 2; break;
+    }
+}
+
+void Player::reset() {
+    score = 0;
+    currentPayload = PAYLOAD_NONE;
+    shielded = false;
+    shieldTimer = 0;
+    glitchEffectTimer = 0;
+    lastDirection = DIR_DOWN;
+    infiniteShield = false;
+    hyperSpeed = false;
+
     switch (playerId) {
         case 0: x = 1; y = 1; break;
         case 1: x = GRID_WIDTH - 2; y = 1; break;
