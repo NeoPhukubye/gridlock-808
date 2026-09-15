@@ -218,9 +218,9 @@ static void render_hud() {
 }
 
 static void reset_game() {
-    grid = Grid();
+    grid.reset();
     for (int i = 0; i < 4; i++) {
-        players[i] = Player(i);
+        players[i].reset();
     }
     gameTimer = 0;
     stateTimer = 0;
