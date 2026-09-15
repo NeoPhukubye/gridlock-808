@@ -26,6 +26,7 @@ enum Direction {
 class Player {
 public:
     Player(int id);
+    void reset();
 
     void update(unsigned short input, Grid& grid);
     void usePayload(Grid& grid, Player* players, int num_players);

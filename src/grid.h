@@ -18,6 +18,7 @@ enum TileType {
 class Grid {
 public:
     Grid();
+    void reset();
 
     void update();
     void render();
