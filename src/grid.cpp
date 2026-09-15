@@ -3,33 +3,36 @@
 #include "game_state.h"
 #include <stdlib.h>
 
+static int decay_timer = 0;
+
 Grid::Grid() {
+    reset();
+}
+
+void Grid::reset() {
+    decay_timer = 0;
     for (int y = 0; y < GRID_HEIGHT; ++y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
             if (x == 0 || x == GRID_WIDTH - 1 || y == 0 || y == GRID_HEIGHT - 1) {
-                tiles[x][y] = TILE_FIREWALL; // Use firewall as border
+                tiles[x][y] = TILE_FIREWALL;
             } else {
                 tiles[x][y] = TILE_NEUTRAL;
             }
         }
     }
-    // Placeholder for nodes
     tiles[GRID_WIDTH / 2][GRID_HEIGHT / 2] = TILE_NODE;
 
-    // Generate random static obstacles (firewalls)
     int obstacles_placed = 0;
     while (obstacles_placed < 6) {
         int rx = rand() % (GRID_WIDTH - 2) + 1;
         int ry = rand() % (GRID_HEIGHT - 2) + 1;
 
-        // Skip spawn points and their adjacent 3x3 tiles, and the central node
-        if (abs(rx - 1) <= 1 && abs(ry - 1) <= 1) continue; // P1 area
-        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - 1) <= 1) continue; // P2 area
-        if (abs(rx - 1) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue; // P3 area
-        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue; // P4 area
-        if (rx == GRID_WIDTH / 2 && ry == GRID_HEIGHT / 2) continue; // Central node
+        if (abs(rx - 1) <= 1 && abs(ry - 1) <= 1) continue;
+        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - 1) <= 1) continue;
+        if (abs(rx - 1) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue;
+        if (abs(rx - (GRID_WIDTH - 2)) <= 1 && abs(ry - (GRID_HEIGHT - 2)) <= 1) continue;
+        if (rx == GRID_WIDTH / 2 && ry == GRID_HEIGHT / 2) continue;
 
-        // Place obstacle if cell is neutral
         if (tiles[rx][ry] == TILE_NEUTRAL) {
             tiles[rx][ry] = TILE_FIREWALL;
             obstacles_placed++;
@@ -38,7 +41,6 @@ Grid::Grid() {
 }
 
 void Grid::update() {
-    static int decay_timer = 0;
     decay_timer++;
 
     // Every 5 seconds, one random captured tile decays back to neutral
