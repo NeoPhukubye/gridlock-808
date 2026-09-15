@@ -15,6 +15,7 @@ enum GameState {
     STATE_WAITING_LINK,
     STATE_COUNTDOWN,
     STATE_PLAYING,
+    STATE_PAUSED,
     STATE_GAME_OVER
 };
 
