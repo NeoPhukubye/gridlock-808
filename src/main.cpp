@@ -23,9 +23,12 @@ static int stateTimer = 0;
 static int gameTimer = 0;
 static int num_players = 1;
 static int local_id = 0;
+static bool isPaused = false;
+static int lastLowTimeSec = -1;
 
 static Grid grid;
 static Player players[4] = {Player(0), Player(1), Player(2), Player(3)};
+static int move_delay = 0;
 
 // Seed the RNG from an unpredictable source (frame timing + VCOUNT)
 static void seed_rng() {
@@ -110,11 +113,32 @@ static void render_countdown() {
     draw_text(112, 70, count_str, RGB5(31, 31, 0));
 }
 
-static void render_game_over() {
-    // Dim the screen by overlaying dark pixels on odd lines
+static void render_paused() {
+    // Semi-transparent overlay
     for (int y = 0; y < 160; y += 2) {
         for (int x = 0; x < 240; x += 2) {
             m3_plot(x, y, RGB5(0, 0, 0));
+        }
+    }
+
+    draw_text(68, 65, "PAUSED", RGB5(31, 31, 0));
+
+    if ((stateTimer / 30) % 2 == 0) {
+        draw_text(48, 90, "SELECT: RESUME", RGB5(31, 31, 31));
+    }
+}
+
+static void render_game_over() {
+    // Clear screen fully
+    memset((void*)0x06000000, 0, 240 * 160 * 2);
+
+    // Dim overlay
+    for (int y = 0; y < 160; y += 2) {
+        for (int x = 0; x < 240; x += 4) {
+            m3_plot(x, y, RGB5(0, 0, 0));
+            m3_plot(x + 1, y, RGB5(0, 0, 0));
+            m3_plot(x + 2, y, RGB5(0, 0, 0));
+            m3_plot(x + 3, y, RGB5(0, 0, 0));
         }
     }
 
@@ -199,8 +223,10 @@ static void reset_game() {
         players[i] = Player(i);
     }
     gameTimer = 0;
+    stateTimer = 0;
+    lastLowTimeSec = -1;
+    move_delay = 0;
 
-    // Place additional starting nodes
     for (int n = 0; n < NODE_COUNT_INITIAL - 1; n++) {
         int rx = rand() % (GRID_WIDTH - 4) + 2;
         int ry = rand() % (GRID_HEIGHT - 4) + 2;
@@ -261,6 +287,12 @@ int main() {
         }
 
         case STATE_PLAYING: {
+            if (pressed & KEY_SELECT) {
+                gameState = STATE_PAUSED;
+                stateTimer = 0;
+                break;
+            }
+
             // Clear screen
             memset((void*)0x06000000, 0, 240 * 160 * 2);
             audio_update();
@@ -272,6 +304,15 @@ int main() {
                 stateTimer = 0;
                 play_game_over_sound();
                 break;
+            }
+
+            // Low-time warning beep
+            int seconds_left = (GAME_DURATION_FRAMES - gameTimer) / 60;
+            if (seconds_left <= 15 && seconds_left > 0) {
+                if (seconds_left != lastLowTimeSec) {
+                    lastLowTimeSec = seconds_left;
+                    play_countdown_beep();
+                }
             }
 
 #ifdef DEBUG
@@ -289,7 +330,6 @@ int main() {
 #endif
 
             // Movement input with smooth repeating
-            static int move_delay = 0;
             unsigned short my_input = 0;
 
             if (held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) {
@@ -366,6 +406,14 @@ int main() {
             render_hud();
             break;
         }
+
+        case STATE_PAUSED:
+            render_paused();
+            if (pressed & KEY_SELECT) {
+                gameState = STATE_PLAYING;
+                stateTimer = 0;
+            }
+            break;
 
         case STATE_GAME_OVER:
             render_game_over();
