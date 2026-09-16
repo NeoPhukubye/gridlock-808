@@ -29,6 +29,7 @@ Think Bomberman meets TRON inside a localized network grid.
 
 🛠️ Technical Profile
 
+
 This project is built directly down to raw hardware with zero AI-generated code, art, or audio, focusing entirely on strict, authentic retro-engineering:  
 
     Language Stack: C++ utilizing highly clean, memory-efficient Object-Oriented Design patterns.
