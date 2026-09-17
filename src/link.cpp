@@ -120,10 +120,12 @@ int link_sync_inputs(unsigned short my_input, unsigned short* all_inputs) {
     if (currentLinkState == LINK_STATE_ACTIVE) {
         unsigned short results[4];
         if (link_transfer(my_input, results)) {
-            all_inputs[0] = results[0];
-            all_inputs[1] = results[1];
-            all_inputs[2] = results[2];
-            all_inputs[3] = results[3];
+            // A slot reading 0xFFFF means no participant is driving it
+            // (hardware pull-up on unused Multi slots). Treat as no input
+            // so disconnected players don't spam keys into the game state.
+            for (int i = 0; i < 4; ++i) {
+                all_inputs[i] = (results[i] == 0xFFFF) ? 0 : results[i];
+            }
             return numConnectedPlayers;
         } else {
             // Error occurred (e.g., player disconnected mid-game)
