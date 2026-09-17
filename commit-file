@@ -1,0 +1,10 @@
+#!/bin/bash
+# Commit a single file - you are the only author
+if [ -z "$1" ]; then
+  echo "Usage: ./commit-file <filename> [message]"
+  exit 1
+fi
+FILE="$1"
+MSG="${2:-\"update $FILE\"}"
+git add "$FILE"
+git commit -m "$MSG" --author="Neo Phukubye <nephujhb025@student.wethinkcode.co.za>"
