@@ -7,7 +7,11 @@
 
 // Global mock register instances
 volatile unsigned short REG_DISPCNT = 0;
+volatile unsigned short REG_VCOUNT = 0;
 int mock_frame_count = 0;
+
+// Framebuffer for headless testing
+volatile unsigned short MEM_VRAM[240 * 160];
 
 volatile unsigned short mock_REG_SIOCNT = 0;
 volatile unsigned short mock_REG_SIOMLT_SEND = 0;
@@ -22,24 +26,32 @@ static unsigned short mock_input_keys = 0;
 void scanKeys() {
     // In our headless simulation, we will simulate various button presses over time
     mock_input_keys = 0;
-    
-    // Press SELECT to test glitch packets, and A to use payloads
+
+    // Press START to begin
     if (mock_frame_count == 15) {
-        mock_input_keys |= KEY_START; // start game / menu
+        mock_input_keys |= KEY_START;
     }
     if (mock_frame_count == 25) {
-        mock_input_keys |= KEY_RIGHT; // move right
+        mock_input_keys |= KEY_RIGHT;
     }
     if (mock_frame_count == 35) {
-        mock_input_keys |= KEY_DOWN; // move down
+        mock_input_keys |= KEY_DOWN;
     }
     if (mock_frame_count == 45) {
-        mock_input_keys |= KEY_A; // use payload
+        mock_input_keys |= KEY_A;
     }
 }
 
 unsigned short keysDown() {
     return mock_input_keys;
+}
+
+unsigned short keysHeld() {
+    // Simulate held keys for movement
+    if (mock_frame_count >= 25 && mock_frame_count < 60) {
+        return KEY_RIGHT;
+    }
+    return 0;
 }
 
 void VBlankIntrWait() {
@@ -72,7 +84,7 @@ void VBlankIntrWait() {
 
     // Print periodic test logs
     if (mock_frame_count % 10 == 0) {
-        printf("[Frame %d] Simulated tick. REG_SIOCNT: 0x%04X, SIOMULTI1: 0x%04X\n", 
+        printf("[Frame %d] Simulated tick. REG_SIOCNT: 0x%04X, SIOMULTI1: 0x%04X\n",
                mock_frame_count, mock_REG_SIOCNT, mock_REG_SIOMULTI1);
     }
 
