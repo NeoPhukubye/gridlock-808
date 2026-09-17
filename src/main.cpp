@@ -15,7 +15,11 @@
 
 // VBlank register (use libgba's if available)
 #ifndef REG_VCOUNT
-#define REG_VCOUNT (*(volatile unsigned short*)0x04000006)
+  #ifdef MOCK_GBA
+    extern volatile unsigned short REG_VCOUNT;
+  #else
+    #define REG_VCOUNT (*(volatile unsigned short*)0x04000006)
+  #endif
 #endif
 
 static GameState gameState = STATE_TITLE;
@@ -41,8 +45,7 @@ static void seed_rng() {
 }
 
 static void vblank_wait() {
-    while (REG_VCOUNT >= 160);
-    while (REG_VCOUNT < 160);
+    VBlankIntrWait();
 }
 
 static void render_title() {
