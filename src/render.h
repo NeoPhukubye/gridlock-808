@@ -4,7 +4,15 @@
 // GBA Mode 3/5 framebuffer
 #define SCREEN_WIDTH  240
 #define SCREEN_HEIGHT 160
-#define MEM_VRAM ((volatile unsigned short*)0x06000000)
+
+// MEM_VRAM: either real hardware VRAM address (GBA) or a desktop array (mock)
+#ifndef MEM_VRAM
+  #ifdef MOCK_GBA
+    extern volatile unsigned short MEM_VRAM[SCREEN_WIDTH * SCREEN_HEIGHT];
+  #else
+    #define MEM_VRAM ((volatile unsigned short*)0x06000000)
+  #endif
+#endif
 
 // Mode 5 page flipping (160x128 double-buffered)
 #define PAGE_SIZE 0xA000
